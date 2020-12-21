@@ -66,8 +66,16 @@
   return videoDevice.formats;
 }
 
+- (void) getLocalCurrentLocation:(void(^)(AVCaptureVideoOrientation interface)) completion {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        completion([self getCurrentOrientation: orientation]);
+    });
+}
+
 - (AVCaptureVideoOrientation) getCurrentOrientation {
-  return [self getCurrentOrientation: [[UIApplication sharedApplication] statusBarOrientation]];
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+  return [self getCurrentOrientation: orientation];
 }
 
 - (AVCaptureVideoOrientation) getCurrentOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
@@ -146,10 +154,14 @@
         [self.session addOutput:dataOutput];
       }
 
-      [self updateOrientation:[self getCurrentOrientation]];
-      self.device = videoDevice;
+      [self getLocalCurrentLocation:^(AVCaptureVideoOrientation interface) {
+          [self updateOrientation:interface];
+          self.device = videoDevice;
+          completion(success);
+      }];
 
-      completion(success);
+//      [self updateOrientation:[self getCurrentOrientation]];
+
   });
 }
 
@@ -212,8 +224,10 @@
         [self.session addInput:videoDeviceInput];
         [self setVideoDeviceInput:videoDeviceInput];
       }
-
-      [self updateOrientation:[self getCurrentOrientation]];
+      [self getLocalCurrentLocation:^(AVCaptureVideoOrientation interface) {
+          [self updateOrientation:interface];
+      }];
+//      [self updateOrientation:[self getCurrentOrientation]];
       [self.session commitConfiguration];
       self.device = videoDevice;
 

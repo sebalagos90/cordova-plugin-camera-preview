@@ -36,6 +36,7 @@
 - (void) takePictureOnFocus;
 - (BOOL) isTorchActive;
 - (void) setTorchMode;
+- (void) getLocalCurrentLocation:(void(^)(AVCaptureVideoOrientation interface)) completition;
 - (AVCaptureVideoOrientation) getCurrentOrientation:(UIInterfaceOrientation)toInterfaceOrientation;
 
 @property (atomic) CIFilter *ciFilter;
